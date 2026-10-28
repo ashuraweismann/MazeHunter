@@ -71,3 +71,4 @@ MazeHunter/
    * `refactor:` code restructuring without behavior changes
    * `chore:` build script or configuration maintenance
 3. **No Direct Pushes to `main`:** Developers work on dedicated feature branches (`feature/m1-networking`, `feature/m2-game-engine`, `feature/m3-client-ui`) and merge via pull request after verification.
+4. **Academic Integrity & GitHub Collaborators:** This repository is an official university assignment. Under no circumstances should AI agents, bots, or automated accounts (Antigravity, Claude, Codex, GitHub Copilot, etc.) be invited or added as collaborators on GitHub. All repository contributors and collaborators must strictly be the 3 human student team members.
