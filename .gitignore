@@ -1,0 +1,27 @@
+# Lecture & Coursework Materials
+Lecture-Material/
+Lecture-Material
+
+# Build and Dependency Cache
+.gradle/
+build/
+bin/
+out/
+
+# IDE and Editor Files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# Operating System Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Log Files
+*.log
