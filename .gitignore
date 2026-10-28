@@ -2,6 +2,16 @@
 Lecture-Material/
 Lecture-Material
 
+# AI Agent Configuration & Instruction Files (Ignored from Version Control)
+AGENT.md
+AGENTS.md
+CLAUDE.md
+CODEX.md
+.github/
+.agent/
+*.agent.md
+*_AGENT.md
+
 # Build and Dependency Cache
 .gradle/
 build/
