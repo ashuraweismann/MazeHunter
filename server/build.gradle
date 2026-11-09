@@ -1,0 +1,17 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'com.mazehunter.server.ServerMain'
+}
+
+dependencies {
+    implementation project(':common')
+
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
