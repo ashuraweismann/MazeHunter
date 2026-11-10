@@ -47,6 +47,11 @@ Integration tests verify multi-threaded TCP behavior without requiring a graphic
 ### 3.2 State Synchronization & Command Queue
 * Simulate multiple clients sending simultaneous `MOVE` commands.
 * Verify commands are consumed from `ConcurrentLinkedQueue` by the `GameLoop` and produce deterministic `STATE_UPDATE` broadcasts.
+* Send a burst of 100 `MOVE` messages from one client and verify that commands over the 30-per-second token-bucket allowance are dropped without stopping the server or exceeding the queue bound.
+* Disconnect a player abruptly during a match and verify the next state snapshot excludes that player while the remaining match continues.
+* Complete a match, send `REMATCH`, verify roles, positions, caught state, and ready flags reset, then start a second match on the same server.
+
+The current checkout does not include the graphical `client` module, so the 8-step manual flow below cannot be run against separate desktop instances here. Server-side integration tests exercise the corresponding network, role assignment, movement, catch, disconnect, rematch, and consecutive-match behavior.
 
 ---
 

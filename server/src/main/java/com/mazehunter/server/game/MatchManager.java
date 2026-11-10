@@ -75,6 +75,10 @@ public class MatchManager {
         PlayerState removed = players.remove(playerId);
         if (removed != null) {
             removed.setConnected(false);
+            GameLoop loop = connectionManager.getGameLoop();
+            if (loop != null) {
+                loop.removePlayerCommands(playerId);
+            }
             LOGGER.info("Player {} removed from MatchManager", playerId);
 
             if (status == MatchStatus.IN_PROGRESS) {
@@ -89,6 +93,14 @@ public class MatchManager {
                 } else if (getConnectedPlayerCount() < MIN_PLAYERS_TO_START) {
                     LOGGER.info("Player count dropped below minimum. Match ended.");
                     endMatch(PlayerRole.UNASSIGNED, "INSUFFICIENT_PLAYERS");
+                }
+                if (status == MatchStatus.IN_PROGRESS) {
+                    int remainingSeconds = Math.max(0, durationSeconds - getElapsedSeconds());
+                    connectionManager.broadcast(MessageEnvelope.stateUpdate(
+                            loop != null ? loop.getTickIndex() : 0,
+                            remainingSeconds,
+                            buildSummaries(),
+                            status));
                 }
             } else if (status == MatchStatus.LOBBY) {
                 broadcastLobbyUpdate();
@@ -266,13 +278,20 @@ public class MatchManager {
     }
 
     public synchronized void resetToLobby() {
+        if (status != MatchStatus.GAME_OVER) {
+            return;
+        }
         this.status = MatchStatus.LOBBY;
         for (PlayerState p : players.values()) {
             p.setRole(PlayerRole.UNASSIGNED);
             p.setCaught(false);
+            p.setPosition(maze.getHunterSpawn());
             p.setReady(false);
             connectionManager.findSession(p.getPlayerId()).ifPresent(s -> s.setReady(false));
         }
+        matchStartTimeMs = 0;
+        durationSeconds = DEFAULT_DURATION_SECONDS;
+        matchId = "m-none";
         broadcastLobbyUpdate();
     }
 

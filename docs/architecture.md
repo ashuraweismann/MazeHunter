@@ -19,7 +19,7 @@ Maze Hunter is a multiplayer, real-time client-server maze survival game. The ap
 
 2. **Concurrency & Thread Safety:**
    * **Client Connection Handlers:** Each connected client has an independent reader worker listening on the TCP socket.
-   * **Single-Writer Game Loop:** To prevent race conditions, client reader workers do *not* mutate game state directly. Instead, they enqueue validated `ClientCommand` objects into a thread-safe `ConcurrentLinkedQueue`.
+   * **Single-Writer Game Loop:** To prevent race conditions, client reader workers do *not* mutate game state directly. Instead, they enqueue validated `ClientCommand` objects into a thread-safe `ConcurrentLinkedQueue`. The loop applies a per-player token bucket (30 commands/second, with a burst allowance of 30) and caps the shared queue at 1,000 commands.
    * **Decoupled Game Loop:** A single dedicated thread runs at a fixed tick rate (e.g., 20 Hz). In each tick, it drains the queue, updates the game simulation, detects collisions, checks timers, and dispatches state updates.
    * **Non-blocking Broadcast:** Outgoing state snapshots are dispatched asynchronously so that a slow or lagging client socket does not stall the server game loop.
 
@@ -49,6 +49,7 @@ Maze Hunter is a multiplayer, real-time client-server maze survival game. The ap
 * `game.CollisionDetector`: Marks active Runners caught when they occupy the Hunter's exact grid cell.
 * `maze.MazeValidator`: Uses breadth-first search to validate spawn paths and ensure all walkable corridors are connected.
 * `common.model.MazeGrid`: Represents the 2D grid structure and its spawn tiles.
+* Disconnected clients are removed from match state; remaining clients receive an updated state snapshot while a match continues. A `REMATCH` is accepted after game over and resets connected players to the lobby spawn with roles, caught state, and ready flags cleared.
 
 ### 3.3 `client`
 * `ClientLauncher`: Entry point configuring and launching the LWJGL3 application.
