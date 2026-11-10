@@ -44,8 +44,11 @@ Maze Hunter is a multiplayer, real-time client-server maze survival game. The ap
 * `net.ClientHandler`: Reads newline-delimited JSON messages from the client socket.
 * `game.GameLoop`: Executes the authoritative simulation at fixed intervals.
 * `game.GameWorld`: Manages active player entities, roles, and coordinates.
-* `game.CollisionDetector`: Computes boundary checks, wall obstructions, and Hunter-Runner catches.
-* `maze.Maze`: Represents the 2D grid structure and validates walkable paths between spawns.
+* `game.PlayerState`: Tracks a player's role, position, readiness, caught state, and connection status.
+* `game.MovementValidator`: Rejects inactive-player moves, walls, and out-of-bounds or non-adjacent destinations.
+* `game.CollisionDetector`: Marks active Runners caught when they occupy the Hunter's exact grid cell.
+* `maze.MazeValidator`: Uses breadth-first search to validate spawn paths and ensure all walkable corridors are connected.
+* `common.model.MazeGrid`: Represents the 2D grid structure and its spawn tiles.
 
 ### 3.3 `client`
 * `ClientLauncher`: Entry point configuring and launching the LWJGL3 application.

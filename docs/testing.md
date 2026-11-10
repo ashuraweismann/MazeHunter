@@ -31,6 +31,8 @@ All unit tests are executed using **JUnit 5 Jupiter**. Unit tests do not spin up
 * **Collision Detection:** Verify exact cell overlap logic for Hunter-Runner catch events.
 * **Game Lifecycle:** Test timer countdown logic, single-catch state transitions, and Hunter/Runner win condition triggers.
 
+The simulation unit tests are `MazeValidatorTest`, `MovementValidatorTest`, and `CollisionDetectorTest` in the `server` module.
+
 ---
 
 ## 3. Integration Testing Strategy
