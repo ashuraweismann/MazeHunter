@@ -17,8 +17,10 @@
   }
   ```
 * **Security & Limits:**
-  * Maximum line length is capped at 8,192 bytes (8 KB).
-  * Payloads exceeding 8 KB or non-conforming JSON are rejected with an `ERROR` message or connection termination.
+  * Maximum message length is capped at 8,192 UTF-8 bytes, excluding the newline delimiter.
+  * Messages exceeding 8 KB or non-conforming JSON are rejected with an `ERROR` message or connection termination.
+  * The server expects `CONNECT` as the first message. It assigns the player ID from the socket session; clients must not provide an identity to use for later commands.
+  * The initial server supports up to four simultaneous player sessions. A connection that does not complete `CONNECT` within ten seconds is closed; active sessions remain open until the client disconnects or sends `QUIT`.
 
 ---
 
@@ -219,3 +221,5 @@ Sent to inform a client of a protocol violation, bad state, or rejection.
   }
 }
 ```
+
+The Phase 2 server uses these error codes during connection setup and message framing: `HANDSHAKE_REQUIRED`, `INVALID_CONNECT`, `SERVER_FULL`, `MALFORMED_JSON`, `MALFORMED_MESSAGE`, `LINE_TOO_LONG`, `INVALID_PING`, `ALREADY_CONNECTED`, `UNSUPPORTED_MESSAGE`, and `INTERNAL_ERROR`.
