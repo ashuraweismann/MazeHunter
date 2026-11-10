@@ -1,5 +1,9 @@
 package com.mazehunter.server.net;
 
+import com.mazehunter.common.protocol.MessageEnvelope;
+import com.mazehunter.server.game.GameLoop;
+import com.mazehunter.server.game.MatchManager;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,11 +18,30 @@ public final class ConnectionManager {
     private final Object registrationLock = new Object();
     private final int maximumSessions;
 
+    private volatile MatchManager matchManager;
+    private volatile GameLoop gameLoop;
+
     public ConnectionManager(int maximumSessions) {
         if (maximumSessions < 1) {
             throw new IllegalArgumentException("maximumSessions must be positive");
         }
         this.maximumSessions = maximumSessions;
+    }
+
+    public void setMatchManager(MatchManager matchManager) {
+        this.matchManager = matchManager;
+    }
+
+    public MatchManager getMatchManager() {
+        return matchManager;
+    }
+
+    public void setGameLoop(GameLoop gameLoop) {
+        this.gameLoop = gameLoop;
+    }
+
+    public GameLoop getGameLoop() {
+        return gameLoop;
     }
 
     /** Registers the session and assigns a unique ID, or returns false when full. */
@@ -36,6 +59,9 @@ public final class ConnectionManager {
             String playerId = "p-" + nextPlayerNumber.incrementAndGet();
             session.activate(playerId, playerName);
             sessions.put(playerId, session);
+            if (matchManager != null) {
+                matchManager.registerPlayer(playerId, playerName);
+            }
             return true;
         }
     }
@@ -56,11 +82,40 @@ public final class ConnectionManager {
         return maximumSessions;
     }
 
+    /** Broadcasts an envelope to all currently active sessions. */
+    public void broadcast(MessageEnvelope message) {
+        if (message == null) {
+            return;
+        }
+        for (ClientSession session : sessions.values()) {
+            if (session.isActive()) {
+                session.sendMessage(message);
+            }
+        }
+    }
+
+    /** Sends an envelope to a specific active player session. */
+    public boolean sendTo(String playerId, MessageEnvelope message) {
+        if (playerId == null || message == null) {
+            return false;
+        }
+        ClientSession session = sessions.get(playerId);
+        if (session != null && session.isActive()) {
+            session.sendMessage(message);
+            return true;
+        }
+        return false;
+    }
+
     /** Removes only the expected session, avoiding deletion of a newer entry by ID. */
     public boolean remove(ClientSession session) {
         if (session == null || session.getPlayerId() == null) {
             return false;
         }
-        return sessions.remove(session.getPlayerId(), session);
+        boolean removed = sessions.remove(session.getPlayerId(), session);
+        if (removed && matchManager != null) {
+            matchManager.unregisterPlayer(session.getPlayerId());
+        }
+        return removed;
     }
 }

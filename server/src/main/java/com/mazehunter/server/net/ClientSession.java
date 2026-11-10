@@ -37,6 +37,7 @@ public final class ClientSession implements AutoCloseable {
 
     private volatile String playerId;
     private volatile String playerName;
+    private volatile boolean ready;
 
     public ClientSession(Socket socket) throws IOException {
         this.socket = Objects.requireNonNull(socket, "socket");
@@ -103,6 +104,22 @@ public final class ClientSession implements AutoCloseable {
 
     public boolean isActive() {
         return status.get() == Status.ACTIVE;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public void sendMessage(MessageEnvelope message) {
+        try {
+            send(message);
+        } catch (IOException ignored) {
+            // Drop errors safely; socket closure handles cleanup
+        }
     }
 
     @Override

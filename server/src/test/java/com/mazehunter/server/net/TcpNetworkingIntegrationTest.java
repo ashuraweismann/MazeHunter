@@ -170,9 +170,15 @@ class TcpNetworkingIntegrationTest {
         }
 
         private MessageEnvelope readEnvelope() throws Exception {
-            String line = reader.readLine();
-            assertNotNull(line, "Server closed the connection before replying");
-            return MessageSerializer.deserialize(line);
+            while (true) {
+                String line = reader.readLine();
+                assertNotNull(line, "Server closed the connection before replying");
+                MessageEnvelope envelope = MessageSerializer.deserialize(line);
+                if (envelope.type() == MessageType.LOBBY_UPDATE) {
+                    continue; // Skip asynchronous lobby broadcasts to read the direct response
+                }
+                return envelope;
+            }
         }
 
         private WelcomePayload welcome() {

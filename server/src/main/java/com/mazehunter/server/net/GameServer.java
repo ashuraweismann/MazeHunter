@@ -3,6 +3,8 @@ package com.mazehunter.server.net;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mazehunter.common.protocol.MessageEnvelope;
 import com.mazehunter.common.protocol.MessageSerializer;
+import com.mazehunter.server.game.GameLoop;
+import com.mazehunter.server.game.MatchManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,8 @@ public final class GameServer implements AutoCloseable {
     private final int configuredPort;
     private final int serverTickRate;
     private final ConnectionManager connectionManager;
+    private final MatchManager matchManager;
+    private final GameLoop gameLoop;
     private final AtomicBoolean running = new AtomicBoolean();
     private final Map<Socket, Thread> clientHandlers = new ConcurrentHashMap<>();
     private final Object lifecycleLock = new Object();
@@ -56,8 +60,12 @@ public final class GameServer implements AutoCloseable {
         if (serverTickRate < 1) {
             throw new IllegalArgumentException("serverTickRate must be positive");
         }
-        configuredPort = port;
-        connectionManager = new ConnectionManager(maxPlayers);
+        this.configuredPort = port;
+        this.connectionManager = new ConnectionManager(maxPlayers);
+        this.matchManager = new MatchManager(connectionManager);
+        this.gameLoop = new GameLoop(matchManager);
+        this.connectionManager.setMatchManager(matchManager);
+        this.connectionManager.setGameLoop(gameLoop);
         this.serverTickRate = serverTickRate;
     }
 
@@ -86,6 +94,7 @@ public final class GameServer implements AutoCloseable {
             serverSocket = listener;
             running.set(true);
             installShutdownHook();
+            gameLoop.start();
 
             acceptThread = new Thread(this::acceptConnections, "maze-server-accept");
             acceptThread.setDaemon(false);
@@ -174,6 +183,7 @@ public final class GameServer implements AutoCloseable {
 
     private void stopInternal(boolean removeHook) {
         boolean wasRunning = running.getAndSet(false);
+        gameLoop.stop();
         ServerSocket listener = serverSocket;
         if (listener != null) {
             try {
@@ -250,6 +260,14 @@ public final class GameServer implements AutoCloseable {
 
     public ConnectionManager getConnectionManager() {
         return connectionManager;
+    }
+
+    public MatchManager getMatchManager() {
+        return matchManager;
+    }
+
+    public GameLoop getGameLoop() {
+        return gameLoop;
     }
 
     @Override

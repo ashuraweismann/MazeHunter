@@ -5,7 +5,12 @@ import com.mazehunter.common.protocol.ConnectPayload;
 import com.mazehunter.common.protocol.MessageEnvelope;
 import com.mazehunter.common.protocol.MessageSerializer;
 import com.mazehunter.common.protocol.MessageType;
+import com.mazehunter.common.protocol.MovePayload;
 import com.mazehunter.common.protocol.PingPayload;
+import com.mazehunter.common.protocol.ReadyPayload;
+import com.mazehunter.server.game.ClientCommand;
+import com.mazehunter.server.game.GameLoop;
+import com.mazehunter.server.game.MatchManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,8 +109,34 @@ public final class ClientHandler implements Runnable {
                     break;
                 } else if (envelope.type() == MessageType.CONNECT) {
                     sendError(session, "ALREADY_CONNECTED", "This connection already completed CONNECT.");
+                } else if (envelope.type() == MessageType.READY) {
+                    try {
+                        ReadyPayload readyPayload = envelope.parsePayload(ReadyPayload.class);
+                        session.setReady(readyPayload.ready());
+                        MatchManager mm = connectionManager.getMatchManager();
+                        if (mm != null) {
+                            mm.setPlayerReady(session.getPlayerId(), readyPayload.ready());
+                        }
+                    } catch (JsonProcessingException exception) {
+                        sendError(session, "INVALID_READY", "READY payload is invalid.");
+                    }
+                } else if (envelope.type() == MessageType.MOVE) {
+                    try {
+                        MovePayload movePayload = envelope.parsePayload(MovePayload.class);
+                        GameLoop loop = connectionManager.getGameLoop();
+                        if (loop != null) {
+                            loop.enqueueCommand(new ClientCommand(session.getPlayerId(), MessageType.MOVE, movePayload));
+                        }
+                    } catch (JsonProcessingException exception) {
+                        sendError(session, "INVALID_MOVE", "MOVE payload is invalid.");
+                    }
+                } else if (envelope.type() == MessageType.REMATCH) {
+                    MatchManager mm = connectionManager.getMatchManager();
+                    if (mm != null) {
+                        mm.resetToLobby();
+                    }
                 } else {
-                    sendError(session, "UNSUPPORTED_MESSAGE", "This message is not available in Phase 2.");
+                    sendError(session, "UNSUPPORTED_MESSAGE", "Unsupported message type: " + envelope.type());
                 }
             }
         } catch (LimitedUtf8LineReader.LineTooLongException exception) {
