@@ -15,7 +15,7 @@ public final class PlayerState {
 
     private final String playerId;
     private final String name;
-    private final PlayerRole role;
+    private PlayerRole role;
     private GridPosition position;
     private boolean caught;
     private boolean ready;
@@ -29,6 +29,10 @@ public final class PlayerState {
         this.connectionStatus = ConnectionStatus.CONNECTED;
     }
 
+    public PlayerState(String playerId, String name, GridPosition position) {
+        this(playerId, name, PlayerRole.UNASSIGNED, position);
+    }
+
     public String getPlayerId() {
         return playerId;
     }
@@ -39,6 +43,10 @@ public final class PlayerState {
 
     public PlayerRole getRole() {
         return role;
+    }
+
+    public void setRole(PlayerRole role) {
+        this.role = Objects.requireNonNull(role, "role");
     }
 
     public GridPosition getPosition() {
@@ -61,6 +69,10 @@ public final class PlayerState {
         caught = true;
     }
 
+    public void setCaught(boolean caught) {
+        this.caught = caught;
+    }
+
     public boolean isReady() {
         return ready;
     }
@@ -77,8 +89,20 @@ public final class PlayerState {
         this.connectionStatus = Objects.requireNonNull(connectionStatus, "connectionStatus");
     }
 
+    public boolean isConnected() {
+        return connectionStatus == ConnectionStatus.CONNECTED;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connectionStatus = connected ? ConnectionStatus.CONNECTED : ConnectionStatus.DISCONNECTED;
+    }
+
     public boolean isActive() {
         return connectionStatus == ConnectionStatus.CONNECTED && !caught;
+    }
+
+    public boolean isActiveRunner() {
+        return role == PlayerRole.RUNNER && isActive();
     }
 
     private static String requireText(String value, String fieldName) {
