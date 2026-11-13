@@ -43,14 +43,41 @@ MazeHunter/
 │   ├── setup.md                   # Development environment setup instructions
 │   ├── testing.md                 # Testing strategy & acceptance verification
 │   └── team_work_division.md      # Detailed 3-member task breakdown & contracts
-├── common/                        # (Phase 1) Shared DTOs, JSON models & validation
-├── server/                        # (Phase 2) Authoritative headless TCP server
-└── client/                        # (Phase 3) Graphical desktop game client
+├── common/                        # Shared protocol DTOs, JSON models & coordinate math
+├── server/                        # Authoritative headless TCP server & 20 Hz simulation
+└── client/                        # Graphical desktop game client (LibGDX / LWJGL3)
 ```
 
 ---
 
-## 4. Technical Documentation
+## 4. Quick Start
+
+### 4.1 Prerequisites
+* Java Development Kit (JDK) 17 LTS (64-bit)
+* Gradle Wrapper (included, no standalone Gradle installation required)
+
+### 4.2 Build & Run Tests
+```bash
+./gradlew build
+```
+*(On Windows, run `.\gradlew.bat build`)*
+
+### 4.3 Start Dedicated Server
+```bash
+./gradlew :server:run
+```
+*(Server listens on port `8080` by default)*
+
+### 4.4 Launch Desktop Clients
+In separate terminal windows (on the same machine or across Wi-Fi):
+```bash
+./gradlew :client:run
+```
+On the Menu Screen, enter the server's IP address (e.g. `127.0.0.1` locally, or `192.168.x.x` over Wi-Fi), port `8080`, and your player name, then click **Connect**.
+
+---
+
+## 5. Technical Documentation
 
 * [Team Work Division & Contracts](docs/team_work_division.md)
 * [System Architecture](docs/architecture.md)
@@ -60,7 +87,7 @@ MazeHunter/
 
 ---
 
-## 5. Development Guidelines & Atomic Commits
+## 6. Development Guidelines & Atomic Commits
 
 1. **Coursework Materials Ignored:** All lecture notes and workshop examples in `Lecture-Material/` are placed in `.gitignore` and excluded from git tracking.
 2. **Atomic Commits:** Every commit must be atomic, self-contained, and follow standard conventional commit prefixes:

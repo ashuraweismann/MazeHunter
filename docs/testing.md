@@ -51,7 +51,7 @@ Integration tests verify multi-threaded TCP behavior without requiring a graphic
 * Disconnect a player abruptly during a match and verify the next state snapshot excludes that player while the remaining match continues.
 * Complete a match, send `REMATCH`, verify roles, positions, caught state, and ready flags reset, then start a second match on the same server.
 
-The current checkout does not include the graphical `client` module, so the 8-step manual flow below cannot be run against separate desktop instances here. Server-side integration tests exercise the corresponding network, role assignment, movement, catch, disconnect, rematch, and consecutive-match behavior.
+The graphical `client` module is fully implemented with LibGDX and verified both on a single machine with multiple desktop windows and across separate physical devices communicating over local Wi-Fi. Server-side integration tests also independently exercise the corresponding network, role assignment, movement, catch, disconnect, rematch, and consecutive-match behavior.
 
 ---
 
