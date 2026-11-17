@@ -77,8 +77,15 @@ On the Menu Screen, enter the server's IP address (e.g. `127.0.0.1` locally, or 
 
 ---
 
-## 5. Technical Documentation
+## 5. Technical Documentation & Demo Evaluation
 
+### 5.1 Presentation & Viva Defense Guides
+* **Canva Demo Presentation (Light Mode):** [Open Presentation Slideshow](https://www.canva.com/d/N4e6QGjC8rOYvW6) ([canva.link/uu8zwar4y33fv0l](https://canva.link/uu8zwar4y33fv0l))
+* **Member 1 (Herath H.M.K.U.A. - Systems & TCP Networking):** [docs/viva/MEMBER_1_HERATH_NETWORKING.md](docs/viva/MEMBER_1_HERATH_NETWORKING.md)
+* **Member 2 (Hansana H.A.J. - Game Engine & Simulation):** [docs/viva/MEMBER_2_HANSANA_ENGINE.md](docs/viva/MEMBER_2_HANSANA_ENGINE.md)
+* **Member 3 (Ranawaka P.S. - Desktop Client & Thread Isolation):** [docs/viva/MEMBER_3_RANAWAKA_CLIENT.md](docs/viva/MEMBER_3_RANAWAKA_CLIENT.md)
+
+### 5.2 Technical Specifications
 * [Team Work Division & Contracts](docs/team_work_division.md)
 * [System Architecture](docs/architecture.md)
 * [Network Protocol Specification](docs/protocol.md)
